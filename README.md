@@ -108,11 +108,11 @@ The **Deeper Network achieved the best MAE of 0.007** with sufficient patience, 
 
 Following He et al. (2020), I implemented a two-phase training strategy: 5,000 Adam steps followed by L-BFGS fine-tuning on fixed collocation points.
 
-![Predictions — Hybrid Optimizer](images/temp_23_1)
+![Predictions — Hybrid Optimizer](images/temp_23_1.png)
 
-![Training Loss — Hybrid Optimizer](images/temp_23_2)
+![Training Loss — Hybrid Optimizer](images/temp_23_2.png)
 
-![Absolute Error — Hybrid Optimizer](images/temp_23_3)
+![Absolute Error — Hybrid Optimizer](images/temp_23_3.png)
 
 **Results (ξ = 0.1):**
 
