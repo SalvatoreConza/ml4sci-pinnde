@@ -8,7 +8,9 @@
 
 This project explores using **Physics-Informed Neural Networks (PINNs)** to build ultra-fast samplers that map an easy-to-sample density (e.g. an *n*-dimensional normal) to a desired *n*-dimensional target density. One promising approach computes this mapping by solving the **reverse-time diffusion equation** — an integro-differential equation whose integral term can be approximated via Monte Carlo integration ([Lu et al., 2022](https://arxiv.org/abs/2206.00927); [Liu et al., 2023](https://arxiv.org/abs/2310.14458)). Because solving this equation repeatedly is slow, neural networks are typically trained on pre-generated solutions.
 
-Instead, this project investigates **modeling the diffusion equation solution directly with a PINN** ([Cuomo et al., 2022](https://arxiv.org/abs/2201.05624)). The large upfront training cost is amortized over fast subsequent sampling.
+Instead, this project investigates **modeling the diffusion equation solution directly with a PINN** ([Cuomo et al., 2022](https://arxiv.org/abs/2201.05624)). The large upfront training cost is amortized over fast subsequent sampling.    
+
+I suggest to look to the python notebook first.
 
 ### Goals
 
@@ -144,6 +146,13 @@ Four architectures compared under identical training conditions (Adam, batch=100
 | **Wider Network** | 1 × 200 | Shallow but wide (Universal Approximation Theorem) |
 | **Weighted ICs (λ=10)** | 3 × 50 | Stronger initial condition enforcement |
 
+![Predictions — Experiment Set 1](images/set1_predictions.png)
+*PINN solutions vs. analytical solutions for ξ = 0.1, 0.25, 0.4*
+
+![Training Loss — Experiment Set 1](images/set1_loss.png)
+
+![Absolute Error — Experiment Set 1](images/set1_errors.png)
+
 **Quantitative Results (ξ = 0.1 — hardest case):**
 
 | Model | MAE | Max Error | L2 Rel Error | Steps |
@@ -159,6 +168,12 @@ Four architectures compared under identical training conditions (Adam, batch=100
 
 Allowing longer training yielded dramatic improvements, especially for Standard Tanh and Deeper Network:
 
+![Predictions — Extended Training](images/set3_predictions.png)
+
+![Training Loss — Extended Training](images/set3_loss.png)
+
+![Absolute Error — Extended Training](images/set3_errors.png)
+
 **Results (ξ = 0.1):**
 
 | Model | MAE | Max Error | L2 Rel Error | Steps |
@@ -173,6 +188,12 @@ The **Deeper Network achieved the best MAE of 0.007** with sufficient patience, 
 ### Hybrid Adam + L-BFGS Optimization
 
 Following He et al. (2020), I implemented a two-phase training strategy: 5,000 Adam steps followed by L-BFGS fine-tuning on fixed collocation points.
+
+![Predictions — Hybrid Optimizer](images/hybrid_predictions.png)
+
+![Training Loss — Hybrid Optimizer](images/hybrid_loss.png)
+
+![Absolute Error — Hybrid Optimizer](images/hybrid_errors.png)
 
 **Results (ξ = 0.1):**
 
