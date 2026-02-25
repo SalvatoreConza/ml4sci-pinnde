@@ -1,30 +1,27 @@
-# GSoC 2026 — Physics-Informed Neural Network Diffusion Equation (PINNDE)
+# Physics-Informed Neural Network for the Diffusion Equation (PINNDE)
 
-**Applicant:** Conza Salvatore Angelo  
-**Organization:** ML4SCI / GENIE  
-**Participating Institutions:** University of Alabama · Florida State University · Fermilab  
-**Mentors:** Harrison B. Prosper (FSU) · Pushpalatha Bhat (Fermilab) · Sergei Gleyzer (U. of Alabama)
+**Author:** Conza Salvatore Angelo
 
 ---
 
-## Project Overview
+## About
 
-There is growing interest in building ultra-fast samplers that map an easy-to-sample density (e.g. an *n*-dimensional normal) to a desired *n*-dimensional target density. One approach computes this mapping by solving the **reverse-time diffusion equation** — an integro-differential equation whose integral term can be approximated via Monte Carlo integration ([Lu et al., 2022](https://arxiv.org/abs/2206.00927); [Liu et al., 2023](https://arxiv.org/abs/2310.14458)). Because solving this equation repeatedly is slow, neural networks are typically trained on pre-generated solutions.
+This project explores using **Physics-Informed Neural Networks (PINNs)** to build ultra-fast samplers that map an easy-to-sample density (e.g. an *n*-dimensional normal) to a desired *n*-dimensional target density. One promising approach computes this mapping by solving the **reverse-time diffusion equation** — an integro-differential equation whose integral term can be approximated via Monte Carlo integration ([Lu et al., 2022](https://arxiv.org/abs/2206.00927); [Liu et al., 2023](https://arxiv.org/abs/2310.14458)). Because solving this equation repeatedly is slow, neural networks are typically trained on pre-generated solutions.
 
-This project investigates an alternative: **modeling the diffusion equation solution directly with a Physics-Informed Neural Network (PINN)** ([Cuomo et al., 2022](https://arxiv.org/abs/2201.05624)). The large upfront training cost is amortized over fast subsequent sampling.
+Instead, this project investigates **modeling the diffusion equation solution directly with a PINN** ([Cuomo et al., 2022](https://arxiv.org/abs/2201.05624)). The large upfront training cost is amortized over fast subsequent sampling.
 
-### Proposed Tasks
+### Goals
 
-1. **3D Normal → Non-Gaussian mapping via PINN** — Inputs: reverse time *t* ∈ [1, 0] and point (*x, y, z*) sampled from a 3D standard normal. Output: vector solution **u**(*t, x, y, z*). Training points can use Sobol quasi-random sampling for uniform domain coverage.
+1. **3D Normal → Non-Gaussian mapping via PINN** — Inputs: reverse time *t* ∈ [1, 0] and point (*x, y, z*) sampled from a 3D standard normal. Output: vector solution **u**(*t, x, y, z*). Training points use Sobol quasi-random sampling for uniform domain coverage.
 2. **Increasingly complex 3D target densities.**
-3. **(Optional)** Apply findings to build a fast calorimeter simulator using [Dataset 1 from the CaloChallenge 2022](https://calochallenge.github.io/homepage/).
+3. **Fast calorimeter simulation** using [Dataset 1 from the CaloChallenge 2022](https://calochallenge.github.io/homepage/).
 4. **Publish results** in an ML paper.
 
 ---
 
-## Test Task: PINN for the Parametric Damped Harmonic Oscillator
+## Current Progress: PINN for the Parametric Damped Harmonic Oscillator
 
-As required by the project test, I implemented a PINN in **PyTorch** to solve the damped harmonic oscillator:
+As a first step, I implemented a PINN in **PyTorch** to solve the damped harmonic oscillator:
 
 $$\frac{d^2x}{dz^2} + 2\xi \frac{dx}{dz} + x = 0$$
 
@@ -138,23 +135,24 @@ Additional architectures from the PINN literature were benchmarked (with Adam+L-
 | **He (5L)** | **He et al. (2020)** | **5 × 32** | **0.0106** | **0.0272** |
 
 The He (5L, 32 neurons) architecture achieved the best overall accuracy among hybrid-trained literature architectures.
-![Predictions — Literature-Based Architectures- Hybrid Optimizer](images/temp_26_1.png)
 
-![Training Loss — Literature-Based Architectures - Hybrid Optimizer](images/temp_26_2.png)
+![Predictions — Literature-Based Architectures](images/temp_26_1.png)
 
-![Absolute Error — Literature-Based Architectures - Hybrid Optimizer](images/temp_26_3.png)
+![Training Loss — Literature-Based Architectures](images/temp_26_2.png)
+
+![Absolute Error — Literature-Based Architectures](images/temp_26_3.png)
 
 ---
 
-## Key Observations & Lessons for the GSoC Project
+## Key Observations & Takeaways
 
-1. **Spectral bias** — The PINN systematically under-performs at inflection points where the derivative changes sign. Lower damping (ξ=0.1) produces more oscillations, making it harder to approximate. This is well-documented as a PINN "failure mode."
+1. **Spectral bias** — The PINN systematically under-performs at inflection points where the derivative changes sign. Lower damping (ξ=0.1) produces more oscillations, making it harder to approximate. This is a well-documented PINN failure mode.
 
 2. **Activation function matters critically** — ReLU completely fails for second-order ODEs because d²(ReLU)/dz² = 0. Smooth activations (Tanh) are essential.
 
-3. **Hybrid optimization is highly effective** — Adam+L-BFGS achieves ~10× faster convergence compared to Adam alone, making it the recommended strategy for the diffusion equation project.
+3. **Hybrid optimization is highly effective** — Adam+L-BFGS achieves ~10× faster convergence compared to Adam alone, making it the recommended strategy going forward.
 
-4. **Dimensionality challenges ahead** — In the 4D diffusion problem (*t, x, y, z*), sampling 1,000 points per dimension would require 10¹² points. **Sobol quasi-random sequences** will be essential for efficient domain coverage, as mentioned in the project description.
+4. **Dimensionality challenges ahead** — In the 4D diffusion problem (*t, x, y, z*), sampling 1,000 points per dimension would require 10¹² points. **Sobol quasi-random sequences** will be essential for efficient domain coverage.
 
 5. **Calorimeter data will need advanced architectures** — Sharp detector response peaks will suffer from PINN smoothing bias. Residual connections, adaptive activation functions, or domain decomposition methods may be necessary.
 
@@ -190,6 +188,3 @@ All experiments use `torch.manual_seed(42)` and `np.random.seed(42)` for reprodu
 3. S. Cuomo et al., *Scientific Machine Learning through Physics-Informed Neural Networks: Where we are and What's next*, [arXiv:2201.05624](https://arxiv.org/abs/2201.05624), 2022.
 4. [Fast Calorimeter Simulation Challenge 2022](https://calochallenge.github.io/homepage/)
 5. [Harmonic Oscillator — Wikipedia](https://en.wikipedia.org/wiki/Harmonic_oscillator)
-
----
-
