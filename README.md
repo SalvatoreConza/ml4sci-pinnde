@@ -27,7 +27,89 @@ $$\frac{d^2x}{dz^2} + 2\xi \frac{dx}{dz} + x = 0$$
 
 with fixed initial conditions $x(0) = 0.7$, $\dot{x}(0) = 1.2$, damping ratio $\xi \in [0.1, 0.4]$, and domain $z \in [0, 20]$.
 
-The full notebook is available at [`PINN_Damped_Oscillator_Test.ipynb`](Untitled__8_.ipynb).
+---
+
+## Project Structure
+
+```
+pinn_damped_oscillator/
+├── model.py              # BasePINN architecture, physics loss, analytical solution
+├── train.py              # Training loops (Adam-only and hybrid Adam + L-BFGS)
+├── plot.py               # Visualization: predictions, loss curves, error plots, tables
+├── experiments.py        # All experiment configurations (6 groups)
+├── run_experiments.py    # Main CLI entry point
+├── images/               # Saved plots (generated with --save-plots)
+└── README.md
+```
+
+| File | Description |
+|---|---|
+| `model.py` | `BasePINN` class (configurable layers/width/activation), `physics_loss()` for the ODE residual, and `analytical_solution()` for validation. |
+| `train.py` | `train_adam()` — Adam optimizer with early stopping on windowed average loss. `train_hybrid()` — Adam warm-up followed by L-BFGS fine-tuning on fixed collocation points. |
+| `plot.py` | `plot_all_predictions()`, `plot_all_losses()`, `plot_all_errors()`, `summary_tables()` — all accept a results dict for multi-experiment comparison. |
+| `experiments.py` | Six experiment groups as Python lists of dicts: `BASELINE`, `BATCH_SIZE`, `PATIENCE`, `HYBRID`, `LITERATURE_ADAM`, `LITERATURE_HYBRID`. |
+| `run_experiments.py` | CLI entry point that orchestrates training + visualization for any or all experiment sets. |
+
+---
+
+## Installation
+
+### Requirements
+
+- Python ≥ 3.8
+- PyTorch ≥ 2.0
+- NumPy
+- Matplotlib
+- Pandas
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/<your-username>/pinn_damped_oscillator.git
+cd pinn_damped_oscillator
+
+# (Recommended) Create a virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+# venv\Scripts\activate   # Windows
+
+# Install dependencies
+pip install torch numpy matplotlib pandas
+```
+
+---
+
+## Usage
+
+### Run all experiments
+
+```bash
+python run_experiments.py
+```
+
+### Run a specific experiment set
+
+```bash
+python run_experiments.py --set baseline      # Set 1: Baseline architectures
+python run_experiments.py --set batch_size     # Set 2: Increased batch size
+python run_experiments.py --set patience       # Set 3: Extended patience
+python run_experiments.py --set hybrid         # Hybrid Adam + L-BFGS
+python run_experiments.py --set literature     # Literature-based architectures
+```
+
+### Save plots to disk
+
+```bash
+python run_experiments.py --save-plots                  # all sets, save to images/
+python run_experiments.py --set hybrid --save-plots     # hybrid only, save to images/
+```
+
+### Run the original notebook (optional)
+
+```bash
+jupyter notebook PINN_Damped_Oscillator_Test.ipynb
+```
 
 ---
 
@@ -62,13 +144,6 @@ Four architectures compared under identical training conditions (Adam, batch=100
 | **Wider Network** | 1 × 200 | Shallow but wide (Universal Approximation Theorem) |
 | **Weighted ICs (λ=10)** | 3 × 50 | Stronger initial condition enforcement |
 
-![Predictions — Experiment Set 1](images/temp_13_1.png)
-*PINN solutions vs. analytical solutions for ξ = 0.1, 0.25, 0.4*
-
-![Training Loss — Experiment Set 1](images/temp_13_2.png)
-
-![Absolute Error — Experiment Set 1](images/temp_13_3.png)
-
 **Quantitative Results (ξ = 0.1 — hardest case):**
 
 | Model | MAE | Max Error | L2 Rel Error | Steps |
@@ -84,12 +159,6 @@ Four architectures compared under identical training conditions (Adam, batch=100
 
 Allowing longer training yielded dramatic improvements, especially for Standard Tanh and Deeper Network:
 
-![Predictions — Extended Training](images/temp_18_1.png)
-
-![Training Loss — Extended Training](images/temp_18_2.png)
-
-![Absolute Error — Extended Training](images/temp_18_3.png)
-
 **Results (ξ = 0.1):**
 
 | Model | MAE | Max Error | L2 Rel Error | Steps |
@@ -104,12 +173,6 @@ The **Deeper Network achieved the best MAE of 0.007** with sufficient patience, 
 ### Hybrid Adam + L-BFGS Optimization
 
 Following He et al. (2020), I implemented a two-phase training strategy: 5,000 Adam steps followed by L-BFGS fine-tuning on fixed collocation points.
-
-![Predictions — Hybrid Optimizer](images/temp_23_1.png)
-
-![Training Loss — Hybrid Optimizer](images/temp_23_2.png)
-
-![Absolute Error — Hybrid Optimizer](images/temp_23_3.png)
 
 **Results (ξ = 0.1):**
 
@@ -136,12 +199,6 @@ Additional architectures from the PINN literature were benchmarked (with Adam+L-
 
 The He (5L, 32 neurons) architecture achieved the best overall accuracy among hybrid-trained literature architectures.
 
-![Predictions — Literature-Based Architectures](images/temp_26_1.png)
-
-![Training Loss — Literature-Based Architectures](images/temp_26_2.png)
-
-![Absolute Error — Literature-Based Architectures](images/temp_26_3.png)
-
 ---
 
 ## Key Observations & Takeaways
@@ -161,21 +218,6 @@ The He (5L, 32 neurons) architecture achieved the best overall accuracy among hy
 ---
 
 ## Reproducibility
-
-### Requirements
-
-```
-torch >= 2.0
-numpy
-matplotlib
-pandas
-```
-
-### Running the Notebook
-
-```bash
-jupyter notebook PINN_Damped_Oscillator_Test.ipynb
-```
 
 All experiments use `torch.manual_seed(42)` and `np.random.seed(42)` for reproducibility.
 
