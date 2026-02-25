@@ -146,12 +146,12 @@ Four architectures compared under identical training conditions (Adam, batch=100
 | **Wider Network** | 1 × 200 | Shallow but wide (Universal Approximation Theorem) |
 | **Weighted ICs (λ=10)** | 3 × 50 | Stronger initial condition enforcement |
 
-![Predictions — Experiment Set 1](images/set1_predictions.png)
+![Predictions — Experiment Set 1](images/temp_13_1.png)
 *PINN solutions vs. analytical solutions for ξ = 0.1, 0.25, 0.4*
 
-![Training Loss — Experiment Set 1](images/set1_loss.png)
+![Training Loss — Experiment Set 1](images/temp_13_2.png)
 
-![Absolute Error — Experiment Set 1](images/set1_errors.png)
+![Absolute Error — Experiment Set 1](images/temp_13_3.png)
 
 **Quantitative Results (ξ = 0.1 — hardest case):**
 
@@ -168,11 +168,12 @@ Four architectures compared under identical training conditions (Adam, batch=100
 
 Allowing longer training yielded dramatic improvements, especially for Standard Tanh and Deeper Network:
 
-![Predictions — Extended Training](images/set3_predictions.png)
+![Predictions — Experiment Set 1](images/temp_16_1.png)
+*PINN solutions vs. analytical solutions for ξ = 0.1, 0.25, 0.4*
 
-![Training Loss — Extended Training](images/set3_loss.png)
+![Training Loss — Experiment Set 1](images/temp_16_2.png)
 
-![Absolute Error — Extended Training](images/set3_errors.png)
+![Absolute Error — Experiment Set 1](images/temp_16_3.png)
 
 **Results (ξ = 0.1):**
 
@@ -189,11 +190,12 @@ The **Deeper Network achieved the best MAE of 0.007** with sufficient patience, 
 
 Following He et al. (2020), I implemented a two-phase training strategy: 5,000 Adam steps followed by L-BFGS fine-tuning on fixed collocation points.
 
-![Predictions — Hybrid Optimizer](images/hybrid_predictions.png)
+![Predictions — Experiment Set 1](images/temp_25_1.png)
+*PINN solutions vs. analytical solutions for ξ = 0.1, 0.25, 0.4*
 
-![Training Loss — Hybrid Optimizer](images/hybrid_loss.png)
+![Training Loss — Experiment Set 1](images/temp_25_2.png)
 
-![Absolute Error — Hybrid Optimizer](images/hybrid_errors.png)
+![Absolute Error — Experiment Set 1](images/temp_25_3.png)
 
 **Results (ξ = 0.1):**
 
@@ -209,6 +211,13 @@ The hybrid approach achieved comparable accuracy in **~8K steps** versus **~78K 
 ### Literature-Based Architectures
 
 Additional architectures from the PINN literature were benchmarked (with Adam+L-BFGS):
+
+![Predictions — Experiment Set 1](images/temp_26_1.png)
+*PINN solutions vs. analytical solutions for ξ = 0.1, 0.25, 0.4*
+
+![Training Loss — Experiment Set 1](images/temp_26_2.png)
+
+![Absolute Error — Experiment Set 1](images/temp_26_3.png)
 
 | Architecture | Source | Layers × Width | MAE (ξ=0.1) | L2 Rel Error |
 |---|---|---|---|---|
