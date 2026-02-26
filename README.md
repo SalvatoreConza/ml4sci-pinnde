@@ -1,4 +1,4 @@
-# Physics-Informed Neural Network for the Diffusion Equation (PINNDE)
+# ⚛️ Physics-Informed Neural Network for the Diffusion Equation (PINNDE)
 
 **Author:** Conza Salvatore Angelo
 
